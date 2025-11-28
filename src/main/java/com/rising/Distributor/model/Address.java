@@ -15,6 +15,6 @@ public class Address {
     private String details;
 
     @ManyToOne
-    @JoinColumn(name = "app_user_uid")
-    private AppUser appUser;
+    @JoinColumn(name = "customer_uid")
+    private User user;
 }

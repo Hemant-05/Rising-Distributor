@@ -1,18 +1,16 @@
 package com.rising.Distributor.model;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "admins")
 @NoArgsConstructor
-public class AppUser {
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,26 +22,15 @@ public class AppUser {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String number;
-
     private String role;
-
-    private Boolean isVerified = false;
 
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
-    private List<Address> addressList;
-
-    public AppUser(String uid, String name, String email, String number, String role, List<Address> addressList) {
-        this.uid = uid;
+    public Admin(String name, String email, String password, String role) {
         this.name = name;
         this.email = email;
-        this.number = number;
-        this.role = role;
-        this.addressList = addressList;
-        this.isVerified = false;
+        this.password = password;
+        this.role = "ADMIN";
     }
-
 }
