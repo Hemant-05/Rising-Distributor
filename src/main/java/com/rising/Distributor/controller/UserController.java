@@ -17,6 +17,14 @@ public class UserController {
         this.userService = userService;
     }
 
+    // Get the profile of the currently logged-in user
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getCurrentUserProfile(Authentication authentication) {
+        String userId = authentication.getName(); // The user's UID from the token
+        UserProfileResponse userProfile = userService.getUserProfile(userId);
+        return ApiResponse.success(HttpStatus.OK, "User profile retrieved successfully", userProfile);
+    }
+
     @PostMapping("/mobile")
     public ResponseEntity<ApiResponse<Void>> saveMobileNumber(@RequestBody MobileRequest request, Authentication authentication) {
         String userId = authentication.getName();

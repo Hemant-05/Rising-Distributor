@@ -64,6 +64,6 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable String pid) {
         productService.deleteProduct(pid);
-        return ApiResponse.success(HttpStatus.NO_CONTENT, "Product deleted successfully");
+        return ApiResponse.success(HttpStatus.OK, "Product deleted successfully");
     }
 }

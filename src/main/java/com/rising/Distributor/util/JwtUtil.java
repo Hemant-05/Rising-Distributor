@@ -3,7 +3,6 @@ package com.rising.Distributor.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +18,11 @@ public class JwtUtil {
 
     private static final String SECRET = "rising-distributor-secret-key-2025-super-secure-32-characters-minimum";
     private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-    private static final long JWT_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 hours
+    
+    // Access token valid for 30 minutes
+    private static final long JWT_ACCESS_TOKEN_VALIDITY = 1000 * 60 * 30; 
+    // Refresh token valid for 7 days
+    private static final long JWT_REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24 * 7;
 
     private final JwtParser jwtParser;
 
@@ -27,19 +30,23 @@ public class JwtUtil {
         this.jwtParser = Jwts.parser().verifyWith(SECRET_KEY).build();
     }
 
-    public String generateToken(String userId, String role) {
+    public String generateAccessToken(String userId, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
-        return createToken(claims, userId);
+        return createToken(claims, userId, JWT_ACCESS_TOKEN_VALIDITY);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(String userId) {
+        return createToken(new HashMap<>(), userId, JWT_REFRESH_TOKEN_VALIDITY);
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long validity) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(SECRET_KEY, Jwts.SIG.HS256) // Explicitly set the algorithm
+                .expiration(new Date(System.currentTimeMillis() + validity))
+                .signWith(SECRET_KEY, Jwts.SIG.HS256)
                 .compact();
     }
 

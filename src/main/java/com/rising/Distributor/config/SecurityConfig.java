@@ -29,25 +29,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        String apiProducts = "/api/products/";
+        String apiProducts = "/api/products";
         String apiAuth = "/api/auth/";
         String apiUsers = "/api/users/";
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public Endpoints
-                        .requestMatchers(apiAuth + "**").permitAll()
+                        // Public Authentication Endpoints
+                        .requestMatchers(apiAuth + "register/**").permitAll()
+                        .requestMatchers(apiAuth + "login").permitAll()
+                        .requestMatchers(apiAuth + "refresh").permitAll()
+                        
+                        // Public User Management Endpoints
                         .requestMatchers(apiUsers + "password/request-reset").permitAll()
                         .requestMatchers(apiUsers + "password/reset").permitAll()
-                        .requestMatchers(apiUsers + "mobile").authenticated()
-                        .requestMatchers(HttpMethod.GET, apiProducts, apiProducts + "**")
-                        .authenticated()
                         
-                        // Admin Endpoints
+                        // Public Product Viewing
+                        .requestMatchers(HttpMethod.GET, apiProducts + "/**").permitAll()
+                        
+                        // Admin Product Management
                         .requestMatchers(HttpMethod.POST, apiProducts).hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, apiProducts + "**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, apiProducts + "**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, apiProducts + "/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, apiProducts + "/**").hasRole("ADMIN")
                         
                         // Any other request requires authentication
                         .anyRequest().authenticated()

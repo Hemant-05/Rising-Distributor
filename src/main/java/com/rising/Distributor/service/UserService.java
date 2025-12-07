@@ -1,5 +1,6 @@
 package com.rising.Distributor.service;
 
+import com.rising.Distributor.dto.UserProfileResponse;
 import com.rising.Distributor.exception.InvalidOtpException;
 import com.rising.Distributor.exception.ResourceNotFoundException;
 import com.rising.Distributor.model.User;
@@ -26,6 +27,19 @@ public class UserService {
     public User registerUser(String name, String email, String mobileNumber, String password) {
         User newUser = new User(name, email, mobileNumber, passwordEncoder.encode(password));
         return userRepository.save(newUser);
+    }
+
+    public UserProfileResponse getUserProfile(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        return new UserProfileResponse(
+            user.getUid(),
+            user.getName(),
+            user.getEmail(),
+            user.getMobileNumber(),
+            user.getIsMobileVerified()
+        );
     }
 
     public void saveMobileNumber(String userId, String mobileNumber) {
