@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -19,10 +22,15 @@ public class UserController {
 
     // Get the profile of the currently logged-in user
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getCurrentUserProfile(Authentication authentication) {
+    public ResponseEntity<ApiResponse<Map<String,Object>>> getCurrentUserProfile(Authentication authentication) {
         String userId = authentication.getName(); // The user's UID from the token
         UserProfileResponse userProfile = userService.getUserProfile(userId);
-        return ApiResponse.success(HttpStatus.OK, "User profile retrieved successfully", userProfile);
+        if (userProfile == null) {
+            return ApiResponse.error(HttpStatus.NOT_FOUND, "User not found");
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("profile",userProfile);
+        return ApiResponse.success(HttpStatus.OK, "User profile retrieved successfully", data);
     }
 
     @PostMapping("/mobile")

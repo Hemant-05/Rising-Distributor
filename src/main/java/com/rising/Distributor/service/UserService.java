@@ -3,7 +3,9 @@ package com.rising.Distributor.service;
 import com.rising.Distributor.dto.UserProfileResponse;
 import com.rising.Distributor.exception.InvalidOtpException;
 import com.rising.Distributor.exception.ResourceNotFoundException;
+import com.rising.Distributor.model.Admin;
 import com.rising.Distributor.model.User;
+import com.rising.Distributor.repository.AdminRepository;
 import com.rising.Distributor.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,11 +17,13 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService) {
+    public UserService(UserRepository userRepository, AdminRepository adminRepository, PasswordEncoder passwordEncoder, OtpService otpService) {
         this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
     }
@@ -32,13 +36,19 @@ public class UserService {
     public UserProfileResponse getUserProfile(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if(user == null ){
+            Admin admin = adminRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Admin Not Found..."));
+            return new UserProfileResponse(admin.getUid(), admin.getName(), admin.getEmail(), "0000000000", false, "ADMIN");
+        }
         
         return new UserProfileResponse(
             user.getUid(),
             user.getName(),
             user.getEmail(),
             user.getMobileNumber(),
-            user.getIsMobileVerified()
+            user.getIsMobileVerified(),
+                "USER"
         );
     }
 

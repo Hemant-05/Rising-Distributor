@@ -44,9 +44,9 @@ public class SecurityConfig {
                         // Public User Management Endpoints
                         .requestMatchers(apiUsers + "password/request-reset").permitAll()
                         .requestMatchers(apiUsers + "password/reset").permitAll()
-                        
+
                         // Public Product Viewing
-                        .requestMatchers(HttpMethod.GET, apiProducts + "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, apiProducts + "/**").authenticated()
                         
                         // Admin Product Management
                         .requestMatchers(HttpMethod.POST, apiProducts).hasRole("ADMIN")
